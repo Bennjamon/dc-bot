@@ -1,0 +1,16 @@
+{
+  "name": "discord-bot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "discord.js": "12.5.1"
+  },
+  "keywords": [
+    "discord",
+    "bot",
+    "comands"
+  ],
+  "author": "Benjamín Rivas Beltrán",
+  "license": "ISC"
+}
