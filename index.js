@@ -1,7 +1,6 @@
-const discord = require('discord.js');
-const { CommandType } = require('./src/Command');
-const Command = require('./src/Command');
-exports.Bot = class Bot {
+import discord from 'discord.js';
+import Command, { CommandType } from './src/Command'
+class Bot {
     constructor(token, defaultPrefix) {
         this.commands = {};
         this.hasDB = false;
@@ -72,4 +71,5 @@ exports.Bot = class Bot {
         })
     }
 }
-exports.EvalCommand = Command.EvalCommand
+export const EvalCommand = Command.EvalCommand
+export const Bot = Bot

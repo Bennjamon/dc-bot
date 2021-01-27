@@ -1,7 +1,7 @@
-const toCode = require('./toCode');
-exports.CommandType = class Command {
+import toCode from './toCode';
+class CommandType {
     constructor(data) {
-        if (data.constructor == Command) {
+        if (data.constructor == CommandType) {
             return data;
         }
         this.data = data.data || {};
@@ -10,7 +10,7 @@ exports.CommandType = class Command {
         this.description = data.description;
     }
 }
-exports.isCommand = (obj) => {
+const isCommand = (obj) => {
     if (obj) {
         if (!obj.name) {
             return false
@@ -26,7 +26,7 @@ exports.isCommand = (obj) => {
     }
 }
 
-exports.EvalCommand = class EvalCommand {
+class EvalCommand {
     constructor(name, data) {
         return {
             data: data || {},
@@ -48,7 +48,7 @@ ${str}
     }
 }
 
-exports.HelpCommand = class HelpCommand {
+class HelpCommand {
     constructor(name, data, cb) {
         return {
             name,
@@ -68,4 +68,11 @@ exports.HelpCommand = class HelpCommand {
             }
         }
     }
+}
+
+export default {
+    isCommand,
+    EvalCommand,
+    HelpCommand,
+    CommandType
 }
