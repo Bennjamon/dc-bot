@@ -1,4 +1,4 @@
-import discord from 'discord.js';
+const discord = require('discord.js');
 const Command, { CommandType, EvalCommand, HelpCommand } = require('./src/Command');
 class Bot {
     constructor(token, defaultPrefix) {
