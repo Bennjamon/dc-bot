@@ -70,7 +70,7 @@ class HelpCommand {
     }
 }
 
-export default {
+exports = {
     isCommand,
     EvalCommand,
     HelpCommand,

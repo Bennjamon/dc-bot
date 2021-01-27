@@ -1,5 +1,5 @@
 import discord from 'discord.js';
-import Command, { CommandType } from './src/Command'
+const Command, { CommandType, EvalCommand, HelpCommand } = require('./src/Command');
 class Bot {
     constructor(token, defaultPrefix) {
         this.commands = {};
@@ -71,5 +71,9 @@ class Bot {
         })
     }
 }
-export const EvalCommand = Command.EvalCommand
-export const Bot = Bot
+module.exports = {
+    Bot,
+    Command: CommandType,
+    HelpCommand,
+    EvalCommand
+};
