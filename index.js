@@ -43,7 +43,7 @@ class Bot {
             if (!msg.author.bot && msg.content.startsWith(this.defaultPrefix)) {
                 const obj = this.commands[msg.content.replace(this.defaultPrefix, '').split(/ +/)[0].toLowerCase()]
                 if (obj) {
-                    const args = msg.content.replace(`${this.defaultPrefix}${msg.content.replace(this.defaultPrefix, '').split(/ +/)[0]}`).split(/ +/g)
+                    const args = msg.content.split(/ +/g).slice(1)
                     if (cb) {
                         cb(false, obj, {
                             msg,
