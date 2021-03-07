@@ -70,7 +70,7 @@ class HelpCommand {
     }
 }
 
-exports = {
+module.exports = {
     isCommand,
     EvalCommand,
     HelpCommand,
