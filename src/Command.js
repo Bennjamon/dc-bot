@@ -1,4 +1,4 @@
-import toCode from './toCode';
+const toCode = require('./toCode');
 class CommandType {
     constructor(data) {
         if (data.constructor == CommandType) {

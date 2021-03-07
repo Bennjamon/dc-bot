@@ -1,13 +1,11 @@
 const discord = require('discord.js');
-const Command, { CommandType, EvalCommand, HelpCommand } = require('./src/Command');
+const Command = require('./src/Command'), { CommandType, EvalCommand, HelpCommand } = require('./src/Command');
 class Bot {
     constructor(token, defaultPrefix) {
         this.commands = {};
-        this.hasDB = false;
         this.token = Buffer.from(token).toString('base64');
         this.defaultPrefix = defaultPrefix;
         this.client = new discord.Client();
-        this.listeningCommands = false
     }
     init() {
         this.client.on("ready", () => {
@@ -45,23 +43,24 @@ class Bot {
             if (!msg.author.bot && msg.content.startsWith(this.defaultPrefix)) {
                 const obj = this.commands[msg.content.replace(this.defaultPrefix, '').split(/ +/)[0].toLowerCase()]
                 if (obj) {
+                    const args = msg.content.replace(`${this.defaultPrefix}${msg.content.replace(this.defaultPrefix, '').split(/ +/)[0]}`).split(/ +/g)
                     if (cb) {
                         cb(false, obj, {
                             msg,
-                            args: msg.content.slice(msg.content.indexOf(" ") + 1).split(/ +/g),
+                            args,
                             client: this.client,
                             discord,
                             bot: this
                         }, () => {
-                            obj.run(msg, msg.content.replace(this.defaultPrefix, '').replace(msg.content.replace(this.defaultPrefix, '').split(/ +/)[0], '').split(/ +/g), this.client, discord, this)
+                            obj.run(msg, args, this.client, discord, this)
                         })
                     } else {
-                        obj.run(msg, msg.content.replace(this.defaultPrefix, '').replace(msg.content.replace(this.defaultPrefix, '').split(/ +/g)[0], ''), this.client, discord, this)
+                        obj.run(msg, args, this.client, discord, this)
                     }
                 } else {
                     if (cb) cb(true, {name: msg.content.replace(this.defaultPrefix, '').split(/ +/)[0]}, {
                         msg,
-                        args: msg.content.slice(msg.content.indexOf(" ") + 1).split(/ +/),
+                        args,
                         client: this.client,
                         discord,
                         bot: this
