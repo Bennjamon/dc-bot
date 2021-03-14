@@ -2,12 +2,12 @@ import discordJS, { Client, Message } from "discord.js";
 import { Bot } from "..";
 declare namespace Command {
     function isCommand (arg: any): arg is CommandData<any>
-    class CommandType<D> {
+    class CommandType<D, UDB, GDB> {
         constructor(data: CommandData<D>)
         data: D
         name: string
         description: string
-        run(msg: Message, args: string[], client: Client, discord: typeof discordJS, bot: Bot): Promise<any>
+        run(msg: Message, args: string[], userDB: UDB, guildDB: GDB, client: Client, discord: typeof discordJS, bot: Bot): Promise<any>
     }
     class EvalCommand<D> {
         constructor(name: string, data: D) 
@@ -15,10 +15,11 @@ declare namespace Command {
     class HelpCommand<D> {
         constructor(name: string, data: D, filter?: (cmd: CommandType<D>) => boolean)
     }
-    interface CommandData<D> {
+    interface CommandData<D, UDB, GDB> {
         name: string
         description: string
         data?: D
+        run(msg: Message, args: string[], userDB: UDB, guildDB: GDB, client: Client, discord: typeof discordJS, bot: Bot): Promise<any>
     }
 }
 

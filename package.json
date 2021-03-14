@@ -1,14 +1,12 @@
 {
   "name": "dc-bot",
-  "version": "1.1.2",
+  "version": "1.2.0",
   "type": "commonjs",
   "description": "",
   "main": "index.js",
-  "scripts": {
-    "test": "node index.js"
-  },
   "dependencies": {
-    "discord.js": "12.5.1"
+    "discord.js": "12.5.1",
+    "fs": "0.0.1-security"
   },
   "repository": {
     "type": "git",
