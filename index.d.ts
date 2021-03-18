@@ -117,6 +117,9 @@ export class Bot<C, GDB = undefined, UDB = undefined> {
     getUserById(id: string): UDB
     getUsers(filter: (user: UDB, key: string, dictionary: ParamsDictionary<UDB>) => boolean, amount: number): UDB[]
     getOneUser(filter: (user: UDB, key: string, dictionary: ParamsDictionary<UDB>) => boolean): UDB
+    getGuildById(id: string): GDB
+    getGuilds(filter: (user: GDB, key: string, dictionary: ParamsDictionary<GDB>) => boolean, amount: number): GDB[]
+    getOneGuild(filter: (user: GDB, key: string, dictionary: ParamsDictionary<GDB>) => boolean): UGDB
 }
 
 export class EvalCommand<D> extends Command.EvalCommand<D> {}

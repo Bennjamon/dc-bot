@@ -86,27 +86,30 @@ class Bot {
             if (!msg.author.bot && msg.content.startsWith(this.defaultPrefix)) {
                 const obj = this.commands[msg.content.replace(this.defaultPrefix, '').split(/ +/)[0].toLowerCase()]
                 const userDB = this.getUserById(msg.author.id)
+                const guildDB = this.getGuildById(msg.guild.id)
                 if (obj) {
                     const args = msg.content.split(/ +/g).slice(1)
                     if (cb) {
                         cb(false, obj, {
                             msg,
                             userDB,
+                            guildDB,
                             args,
                             client: this.client,
                             discord,
                             bot: this
                         }, () => {
-                            obj.run(msg, args, userDB, this.client, discord, this)
+                            obj.run(msg, args, userDB, guildDB, this.client, discord, this)
                         })
                     } else {
-                        obj.run(msg, args, userDB, this.client, discord, this)
+                        obj.run(msg, args, userDB, guildDB, this.client, discord, this)
                     }
                 } else {
                     if (cb) cb(true, {name: msg.content.replace(this.defaultPrefix, '').split(/ +/)[0]}, {
                         msg,
                         args,
                         userDB,
+                        guildDB,
                         client: this.client,
                         discord,
                         bot: this
@@ -124,11 +127,11 @@ class Bot {
                 this.client.users.cache.forEach(u => {
                     if (!this.db.users[u.id]) this.db.users[u.id] = userDB(u)
                 })
-                fs.appendFileSync("DB/users.json", JSON.stringify(this.db.users, null, "\t"))
+                fs.writeFileSync("DB/users.json", JSON.stringify(this.db.users, null, "\t"))
             })
             this.client.on("guildMemberAdd", ({ user }) => {
                 if (!this.db.users[user.id]) this.db.users[user.id] = userDB(user)
-                fs.appendFileSync("DB/users.json", JSON.stringify(this.db.users, null, "\t"))
+                fs.writeFileSync("DB/users.json", JSON.stringify(this.db.users, null, "\t"))
             })
         }
         if (config.guild) {
@@ -137,25 +140,39 @@ class Bot {
                 this.client.guilds.cache.forEach(g => {
                     if (!this.db.guilds[g.id]) this.db.guilds[g.id] = guildDB(g)
                 })
-                fs.appendFileSync("DB/guilds.json", JSON.stringify(this.db.users, null, "\t"))
+                fs.writeFileSync("DB/guilds.json", JSON.stringify(this.db.users, null, "\t"))
             })
             this.client.on("guildMemberAdd", g => {
                 if (!this.db.guilds[g.id]) this.db.guilds[g.id] = guildDB(g)
-                fs.appendFileSync("DB/guilds.json", JSON.stringify(this.db.users, null, "\t"))
+                fs.writeFileSync("DB/guilds.json", JSON.stringify(this.db.users, null, "\t"))
             })
         } 
     }
+
     getUsers (filter, amount) {
-        return Object.fromEntries(Object.entries(this.db.users).filter(e => filter(e[1], e[k], this.db.users)).slice(0, amount))
+        return this.db.users? Object.fromEntries(Object.entries(this.db.users).filter(e => filter(e[1], e[0], this.db.users)).slice(0, amount)) : undefined
     }
 
     getOneUser(filter) {
-        return Object.entries(this.db.users).filter(e => filter(e[1], e[0], this.db.users))
+        return this.db.users? Object.fromEntries(Object.entries(this.db.users).filter(e => filter(e[1], e[0], this.db.users)))[0] : undefined
     }
 
     getUserById(id) {
-        return this.db.users[id]
+        return this.db.users? this.db.users[id] : undefined
     }
+
+    getGuilds(filter, amount) {
+        return this.db.guilds? Object.fromEntries(Object.entries(this.db.guilds).filter(e => filter(e[0], e[1], this.db.guilds))).slice(0, amount) : undefined
+    }
+
+    getOneGuld(filter) {
+        return this.db.guilds? Object.fromEntries(Object.entries(this.db.guilds).filter(e => filter(e[1], e[0], this.db.users)))[0] : undefined
+    }
+
+    getGuildById(id) {
+        return this.db.guilds? this.db.guilds[0] : undefined
+    }
+
 }
 module.exports = {
     Bot,
