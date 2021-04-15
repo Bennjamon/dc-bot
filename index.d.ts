@@ -1,5 +1,6 @@
 import discordJS, { Client, Message } from "discord.js";
-import Command, { CommandType } from './src/Command'
+import Command, { CommandData, HelpCommand, EvalCommand } from './src/Command'
+import CommandConstructor from './src/Command'
 
 export interface GuildInDB {
     prefix?: string,
@@ -15,11 +16,29 @@ export interface UserInDB {
 }
 
 export interface DBOptions<GDB, UDB> {
+    /**
+     * The options for the user database
+     */
     user?: boolean|{
+        /**
+         * The callback to add the users in the database
+         * @param {User} user the user to add in the dastabase 
+         */
         add(user: discordJS.User): UDB
     },
+    /**
+     * The options to the guild database
+     */
     guild?: boolean|{
+        /**
+         * The callback to add the guilds in the database
+         * @param {Guild} guild the guild to add in the dastabase 
+         */
         add(guild: discordJS.Guild): GDB
+        /**
+         * The key of the prefix of the servers
+         */
+        prefixKey?: keyof GDB   
     }
 }
 
@@ -49,6 +68,8 @@ export interface BotOptions<GDB, UDB> {
 export type ParamsDictionary<T> = {
     [key: string]: T
 }
+
+export const Command = CommandConstructor
 
 export class Bot<C, GDB = undefined, UDB = undefined> {
     
@@ -91,7 +112,7 @@ export class Bot<C, GDB = undefined, UDB = undefined> {
      * the commands of the bot
      */
 
-    commands: ParamsDictionary<Command<C>>
+    commands: ParamsDictionary<CommandData<GDB, UDB, C>>
 
     /**
      * Init your discord bot
@@ -100,9 +121,9 @@ export class Bot<C, GDB = undefined, UDB = undefined> {
     init(): Promise<void>
 
     message(callback: (message: Message, userDB: UDB, guildDB: GDB) => void): void
-    addCommand<T>(...commands: (Command.HelpCommand<T>|Command.EvalCommand<T>|Command.CommandData<T, UDB, GDB>|Command.CommandType<T, UDB, GDB>)[]): Bot<T, GDB, UDB>
+    addCommand<T>(...commands: CommandData<GDB, UDB, T>[]): Bot<T, GDB, UDB>
     listenCommands(cb?: (err: boolean, 
-        command: Command.CommandType<C>, context: {
+        command: Command<UDB, GDB, C>, context: {
         msg: Message
         userDB?: UDB
         args: string[]
@@ -114,13 +135,16 @@ export class Bot<C, GDB = undefined, UDB = undefined> {
         guild: boolean
         user: boolean
     }, guildCB?: (guild: discordJS.Guild) => DBU, userCB?: (user: discordJS.User) => DBG): Bot<C, DBG, DBU>
-    getUserById(id: string): UDB
-    getUsers(filter: (user: UDB, key: string, dictionary: ParamsDictionary<UDB>) => boolean, amount: number): UDB[]
-    getOneUser(filter: (user: UDB, key: string, dictionary: ParamsDictionary<UDB>) => boolean): UDB
-    getGuildById(id: string): GDB
-    getGuilds(filter: (user: GDB, key: string, dictionary: ParamsDictionary<GDB>) => boolean, amount: number): GDB[]
-    getOneGuild(filter: (user: GDB, key: string, dictionary: ParamsDictionary<GDB>) => boolean): UGDB
+    getUserById(id: string): Promise<UDB>
+    getUsers(filter: (user: UDB, key: string, dictionary: ParamsDictionary<UDB>) => boolean, amount: number): Promise<ParamsDictionary<UDB>>
+    getUsers(filter: (user: UDB, key: string, dictionary: ParamsDictionary<UDB>) => boolean, amount: 0): Promise<{}>
+    getOneUser(filter: (user: UDB, key: string, dictionary: ParamsDictionary<UDB>) => boolean): Promise<UDB>
+    updateUser<T = {
+        [K in UDB]?: UDB[K]
+    }, R = T&UDB>(id: string, data: T): Promise<R>
+    getGuildById(id: string): Promise<GDB>
+    getGuilds(filter: (user: GDB, key: string, dictionary: ParamsDictionary<GDB>) => boolean, amount: number): Promise<ParamsDictionary<GDB>>
+    getGuilds(filter: (user: GDB, key: string, dictionary: ParamsDictionary<GDB>) => boolean, amount: 0): Promise<{}>
+    getOneGuild(filter: (user: GDB, key: string, dictionary: ParamsDictionary<GDB>) => boolean): Promise<GDB>
 }
 
-export class EvalCommand<D> extends Command.EvalCommand<D> {}
-export class HelpCommand<D> extends Command.HelpCommand<D> {}

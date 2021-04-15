@@ -4,6 +4,9 @@
   "type": "commonjs",
   "description": "",
   "main": "index.js",
+  "scripts": {
+    "test": "node __test__/app.test.js"
+  },
   "dependencies": {
     "discord.js": "12.5.1",
     "fs": "0.0.1-security"
