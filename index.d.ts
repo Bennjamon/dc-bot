@@ -115,6 +115,12 @@ export class Bot<C, GDB = undefined, UDB = undefined> {
     commands: ParamsDictionary<CommandData<GDB, UDB, C>>
 
     /**
+     * the client object of the bot
+     */
+
+    client: Client
+
+    /**
      * Init your discord bot
      */
 

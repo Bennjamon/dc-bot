@@ -53,10 +53,10 @@ class HelpCommand {
                 for (const key in bot.commands) {
                     if (cb) {
                         if (cb(bot.commands[key])) {
-                            embed.addField(key, bot.commands[key].description, true)
+                            embed.addField(key, bot.commands[key].description, "inline" in embedOptioms? Boolean(embedOptioms.inline) : true)
                         }
                     } else {
-                        embed.addField(key, bot.commands[key].description, true)
+                        embed.addField(key, bot.commands[key].description, "inline" in embedOptioms? Boolean(embedOptioms.inline) : true)
                     }
                 }
                 await msg.channel.send(embed)

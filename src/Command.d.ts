@@ -26,6 +26,7 @@ class HelpCommand<D>{
     constructor(name: string, data: D, description: string, filter?: (cmd: CommandData<any, any, D>) => boolean, embedOptions?: {
         title: string
         description: string
+        inline: boolean
     })
     data: D
 }
