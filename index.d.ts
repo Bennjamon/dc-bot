@@ -146,5 +146,8 @@ export class Bot<C, GDB = undefined, UDB = undefined> {
     getGuilds(filter: (user: GDB, key: string, dictionary: ParamsDictionary<GDB>) => boolean, amount: number): Promise<ParamsDictionary<GDB>>
     getGuilds(filter: (user: GDB, key: string, dictionary: ParamsDictionary<GDB>) => boolean, amount: 0): Promise<{}>
     getOneGuild(filter: (user: GDB, key: string, dictionary: ParamsDictionary<GDB>) => boolean): Promise<GDB>
+    updateUser<T = {
+        [K in GDB]?: UDB[K]
+    }, R = T&GDB>(id: string, data: T): Promise<R>
 }
 

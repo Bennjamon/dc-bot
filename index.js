@@ -64,7 +64,7 @@ class Bot {
                 return
             }
             if (!msg.author.bot) {
-                callback(msg)
+                callback(msg, await this.getUserById(msg.author.id, true), await this.getGuildById(msg.guild.id))
             }
         })
     }
@@ -83,7 +83,7 @@ class Bot {
     }
     listenCommands(cb) {
         this.client.on("message", async msg => {
-            const prefix = this.db.guilds && this.prefixKey ? this.db.guilds[msg.guild.id][this.prefixKey] || this.defaultPrefix : this.defaultPrefix
+            const prefix = this.db.guilds && this.prefixKey ? (await this.getGuildById(msg.guild.id))[this.prefixKey] || this.defaultPrefix : this.defaultPrefix
             if (!msg.author.bot && msg.content.startsWith(prefix)) {
                 const obj = this.commands[msg.content.replace(prefix, '').split(/ +/)[0].toLowerCase()]
                 const userDB = await this.getUserById(msg.author.id, true)
@@ -218,7 +218,7 @@ class Bot {
 
     async getGuildById(id, forceded = false) {
         if (this.db.guilds) return this.db.guilds[id]
-        else if (!forceded) throw "The user throw is not seted"
+        else if (!forceded) throw "The guild db is not seted"
     }
 
     updateGuild(id, data) {
