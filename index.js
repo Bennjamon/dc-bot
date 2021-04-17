@@ -83,7 +83,7 @@ class Bot {
     }
     listenCommands(cb) {
         this.client.on("message", async msg => {
-            const prefix = this.db.guilds && this.prefixKey ? this.getGuildById(msg.guild.id)[this.prefixKey] || this.defaultPrefix : this.defaultPrefix
+            const prefix = this.db.guilds && this.prefixKey ? this.db.guilds[msg.guild.id][this.prefixKey] || this.defaultPrefix : this.defaultPrefix
             if (!msg.author.bot && msg.content.startsWith(prefix)) {
                 const obj = this.commands[msg.content.replace(prefix, '').split(/ +/)[0].toLowerCase()]
                 const userDB = await this.getUserById(msg.author.id, true)
