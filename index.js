@@ -4,8 +4,8 @@ const Command = require('./src/Command')
 class Bot {
     constructor(token, defaultPrefix) {
         this.db = {}
-        if (fs.existsSync("DB/users.json")) this.db.users = JSON.parse(fs.readFileSync("DB/users.json", "utf-8"))
-        if (fs.existsSync("DB/guilds.json")) this.db.guilds = JSON.parse(fs.readFileSync("DB/guilds.json", "utf-8"))
+        if (fs.existsSync(require.main.path + "/DB/users.json")) this.db.users = JSON.parse(fs.readFileSync(require.main.path + "/DB/users.json", "utf-8"))
+        if (fs.existsSync(require.main.path + "/DB/guilds.json")) this.db.guilds = JSON.parse(fs.readFileSync(require.main.path + "/DB/guilds.json", "utf-8"))
         this.commands = {}
         this.client = new discord.Client()
         this.onreadys = [
@@ -124,6 +124,7 @@ class Bot {
         if (!fs.existsSync("DB")) fs.mkdirSync("DB")
         const add = (db, obj, key) => {
             const DBObject = this.db[db][key] || {}
+
             for (const key in obj) {
                 if (!DBObject.hasOwnProperty(key)) DBObject[key] = obj[key]
             }
@@ -131,7 +132,7 @@ class Bot {
             fs.writeFileSync(`DB/${db}.json`, JSON.stringify(this.db[db], null, "\t"))
         }
         if (config.user) {
-            this.db.users = {}
+            this.db.users = this.db.users || {}
             this.onreadys.push(() => {
                 this.client.users.cache.forEach(u => add("users", userDB(u), u.id))
             })
@@ -141,8 +142,8 @@ class Bot {
             })
         }
         if (config.guild) {
+            this.db.guilds = this.db.guilds || {}
             this.prefixKey = config.guild.prefixKey
-            this.db.guilds = {}
             this.onreadys.push(() => {
                 this.client.guilds.cache.forEach(g => add("guilds", guildDB(g), g.id))
                 fs.writeFileSync("DB/guilds.json", JSON.stringify(this.db.guilds, null, "\t"))
