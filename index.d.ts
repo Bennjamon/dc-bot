@@ -73,7 +73,7 @@ declare namespace dcBot {
         data: D
         name: string
         description: string
-        run(msg: Message, args: string[], userDB: UDB, guildDB: GDB, client: Client, discord: typeof discordJS, bot: Bot<D, GDB, UDB>): Promise<any>
+        run(msg: Message, args: string[], userDB: UDB, guildDB: GDB, client: Client, discord: typeof discordJS, bot: Bot): Promise<any>
     }
     
     interface CommandConstructor {
@@ -96,11 +96,11 @@ declare namespace dcBot {
 
     }
 
-    export type CommandData<UDB, GDB, D> = Command<D, UDB, GDB>|{
+    export type CommandData<D, UDB, GDB> = Command<D, UDB, GDB>|{
         name: string
         description: string
         data: D
-        run(msg: Message, args: string[], userDB: UDB, guildDB: GDB, client: Client, discord: typeof discordJS, bot: Bot<D, GDB, UDB>): Promise<any>
+        run(msg: Message, args: string[], userDB: UDB, guildDB: GDB, client: Client, discord: typeof discordJS, bot: Bot): Promise<any>
     }
     
     const Command: CommandConstructor
@@ -146,7 +146,7 @@ declare namespace dcBot {
          * the commands of the bot
          */
 
-        commands: ParamsDictionary<CommandData<GDB, UDB, C>>
+        commands: ParamsDictionary<CommandData<C, GDB, UDB>>
 
         /**
          * the client object of the bot
@@ -161,15 +161,15 @@ declare namespace dcBot {
         init(): Promise<void>
 
         message(callback: (message: Message, userDB: UDB, guildDB: GDB) => void): void
-        addCommand<T>(...commands: CommandData<GDB, UDB, T>[]): Bot<T, GDB, UDB>
+        addCommand<T>(...commands: CommandData<T, UDB, GDB>[]): Bot<T, GDB, UDB>
         listenCommands(cb?: (err: boolean, 
-            command: Command<UDB, GDB, C>, context: {
+            command: Command<C, UDB, GDB>, context: {
             msg: Message
             userDB?: UDB
             args: string[]
             client: Client,
             discord: typeof discordJS
-            bot: Bot<C, GDB, UDB>
+            bot: Bot<C, UDB, GDB>
         }, run: () => void) => void): void
         addDB<DBG extends GuildInDB = UDB, DBU extends UserInDB = UDB>(options: {
             guild: boolean
@@ -180,15 +180,15 @@ declare namespace dcBot {
         getUsers(filter: (user: UDB, key: string, dictionary: ParamsDictionary<UDB>) => boolean, amount: 0): Promise<{}>
         getOneUser(filter: (user: UDB, key: string, dictionary: ParamsDictionary<UDB>) => boolean): Promise<UDB>
         updateUser<T = {
-            [K in keyof UDB]?: UDB[K]
+            [K in UDB]?: UDB[K]
         }, R = T&UDB>(id: string, data: T): Promise<R>
         getGuildById(id: string): Promise<GDB>
         getGuilds(filter: (user: GDB, key: string, dictionary: ParamsDictionary<GDB>) => boolean, amount: number): Promise<ParamsDictionary<GDB>>
         getGuilds(filter: (user: GDB, key: string, dictionary: ParamsDictionary<GDB>) => boolean, amount: 0): Promise<{}>
         getOneGuild(filter: (user: GDB, key: string, dictionary: ParamsDictionary<GDB>) => boolean): Promise<GDB>
         updateUser<T = {
-            [K in keyof GDB]?: GDB[K]
-        }>(id: string, data: T): Promise<GDB>
+            [K in GDB]?: UDB[K]
+        }, R = T&GDB>(id: string, data: T): Promise<R>
     }
 
 }

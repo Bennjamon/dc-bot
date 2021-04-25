@@ -1,6 +1,6 @@
 {
   "name": "dc-bot",
-  "version": "1.2.92",
+  "version": "1.2.93",
   "type": "commonjs",
   "description": "",
   "main": "index.js",
