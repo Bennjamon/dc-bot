@@ -73,7 +73,7 @@ declare namespace dcBot {
         data: D
         name: string
         description: string
-        run(msg: Message, args: string[], userDB: UDB, guildDB: GDB, client: Client, discord: typeof discordJS, bot: Bot): Promise<any>
+        run(msg: Message, args: string[], userDB: UDB, guildDB: GDB, client: Client, discord: typeof discordJS, bot: Bot<D, GDB, UDB>): Promise<any>
     }
     
     interface CommandConstructor {
@@ -100,7 +100,7 @@ declare namespace dcBot {
         name: string
         description: string
         data: D
-        run(msg: Message, args: string[], userDB: UDB, guildDB: GDB, client: Client, discord: typeof discordJS, bot: Bot): Promise<any>
+        run(msg: Message, args: string[], userDB: UDB, guildDB: GDB, client: Client, discord: typeof discordJS, bot: Bot<D, GDB, UDB>): Promise<any>
     }
     
     const Command: CommandConstructor
@@ -180,15 +180,15 @@ declare namespace dcBot {
         getUsers(filter: (user: UDB, key: string, dictionary: ParamsDictionary<UDB>) => boolean, amount: 0): Promise<{}>
         getOneUser(filter: (user: UDB, key: string, dictionary: ParamsDictionary<UDB>) => boolean): Promise<UDB>
         updateUser<T = {
-            [K in UDB]?: UDB[K]
+            [K in keyof UDB]?: UDB[K]
         }, R = T&UDB>(id: string, data: T): Promise<R>
         getGuildById(id: string): Promise<GDB>
         getGuilds(filter: (user: GDB, key: string, dictionary: ParamsDictionary<GDB>) => boolean, amount: number): Promise<ParamsDictionary<GDB>>
         getGuilds(filter: (user: GDB, key: string, dictionary: ParamsDictionary<GDB>) => boolean, amount: 0): Promise<{}>
         getOneGuild(filter: (user: GDB, key: string, dictionary: ParamsDictionary<GDB>) => boolean): Promise<GDB>
         updateUser<T = {
-            [K in GDB]?: UDB[K]
-        }, R = T&GDB>(id: string, data: T): Promise<R>
+            [K in keyof GDB]?: GDB[K]
+        }>(id: string, data: T): Promise<GDB>
     }
 
 }
