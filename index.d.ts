@@ -193,5 +193,5 @@ declare module "dc-bot" {
         }
     
     }
-    export = dcBot
+    export default dcBot
 }
