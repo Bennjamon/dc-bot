@@ -81,11 +81,11 @@ class Bot {
         })
         return this
     }
-    listenCommands(cb) {
+    listenCommands(filter, cb) {
         this.client.on("message", async msg => {
             const prefix = this.db.guilds && this.prefixKey ? (await this.getGuildById(msg.guild.id))[this.prefixKey] || this.defaultPrefix : this.defaultPrefix
             if (!msg.author.bot && msg.content.startsWith(prefix)) {
-                const obj = this.commands[msg.content.replace(prefix, '').split(/ +/)[0].toLowerCase()]
+                const obj = this.commands[msg.content.replace(prefix, '').split(/ +/)[0].toLowerCase()] || Object.values(this.commands).find(c => filter(c, msg.content.replace(prefix, '').split(/ +/)[0].toLowerCase()))
                 const userDB = await this.getUserById(msg.author.id, true)
                 const guildDB = await this.getGuildById(msg.guild.id, true)
                 const args = msg.content.split(/ +/g).slice(1)
