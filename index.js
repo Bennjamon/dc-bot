@@ -1,6 +1,7 @@
 const discord = require('discord.js')
 const fs = require('fs')
 const Command = require('./src/Command')
+const tokenSymbol = Symbol("token")
 class Bot {
     constructor(token, defaultPrefix) {
         this.db = {}
@@ -15,17 +16,17 @@ class Bot {
         ]
 
         if (arguments.length > 1) {
-            this.token = Buffer.from(token).toString('base64')
+            this[tokenSymbol] = Buffer.from(token).toString('base64')
             this.defaultPrefix = defaultPrefix
         } else {
             if (token.token) {
-                this.token = Buffer.from(token.token).toString("base64")
+                this[tokenSymbol] = Buffer.from(token.token).toString("base64")
             } else {
                 throw new TypeError("Set the token of your bot")
             }
 
-            if (token.prefix) {
-                this.defaultPrefix = token.prefix
+            if (token.defaultPrefix) {
+                this.defaultPrefix = token.defaultPrefix
             } else {
                 throw new TypeError("Set the prefx of your bot")
             } 
@@ -54,18 +55,29 @@ class Bot {
         this.client.on("ready", () => {
             this.onreadys.forEach(fn => fn())
         })
-        this.client.login(Buffer.from(this.token, 'base64').toString())
+        return this.client.login(Buffer.from(this[tokenSymbol], 'base64').toString())
     }
-    message(callback) {
-        this.client.on("message", async (msg) => {
-            if (msg.content.includes(Buffer.from(this.token, 'base64').toString())) {
-                await msg.delete()
-                await msg.channel.send(`${msg.author} no pongas mi token`)
-                return
+    on(event, callback) {
+        const dbUsers = new discord.Collection()
+        const dbGuilds = new discord.Collection()
+        this.client.on(event, async (...args) => {
+            for (let i = 0; i < args.length; i++) {
+                const d = args[i];
+                if (d.constructor == discord.User) {
+                    if (this.db.users) dbUsers.set(d.id, (await this.getUserById(d.id, true)))
+                } else if (typeof d == "string" && this.client.users.cache.has(d)) {
+                    if (this.db.users) dbUsers.set(d, (await this.getUserById(d, true)))
+                } else if (d.constructor == discord.Message) {
+                    if (this.db.users) dbUsers.set(d.author.id, (await this.getUserById(d.author.id, true)))
+                    if (this.db.guilds) dbGuilds.set(d.guild.id, (await this.getGuildById(d.guild.id, true)))
+                } else if (typeof d == "string" && this.client.guilds.cache.has(d)) {
+                    if (this.db.guilds) dbGuilds.set(d, (await this.getGuildById(d, this.getGuildById(d, true))))
+                } 
             }
-            if (!msg.author.bot) {
-                callback(msg, await this.getUserById(msg.author.id, true), await this.getGuildById(msg.guild.id))
-            }
+            callback(...args, {
+                users: dbUsers,
+                guids: dbGuilds
+            })
         })
     }
     addCommand(...commands) {
@@ -82,6 +94,7 @@ class Bot {
         return this
     }
     listenCommands(filter, cb) {
+        filter = filter || (() => true)
         this.client.on("message", async msg => {
             const prefix = this.db.guilds && this.prefixKey ? (await this.getGuildById(msg.guild.id))[this.prefixKey] || this.defaultPrefix : this.defaultPrefix
             if (!msg.author.bot && msg.content.startsWith(prefix)) {
@@ -157,11 +170,11 @@ class Bot {
 
     async getUsers (filter, amount) {
         if (this.db.users) {
-            let len = 0, res = {}
+            let len = 0, res = new discord.Collection()
             for (const key in this.db.users) {
                 if (len < amount && filter(this.db.users[key], key, this.db.users)) {
                     len++
-                    res[key] = this.db.user[key]
+                    res.set(key, this.db.user[key])
                 }
             }
             return res
@@ -170,9 +183,8 @@ class Bot {
 
     async getOneUser(filter) {
         if (this.db.users) {
-            for (const key in this.db.users) {
-                if (filter(this.db.users[key], key, this.db.users)) return this.db.user[key]
-            }
+            let len = 0, res = new discord.Collection(Object.entries(this.db.users))
+            return new discord.Collection(res.filter(filter).map((v, id) => [id, v]).slice(0, amount))
         } else throw "The user database is not seted"
     }
 
@@ -198,22 +210,15 @@ class Bot {
 
     async getGuilds(filter, amount) {
         if (this.db.guilds) {
-            let len = 0, res = {}
-            for (const key in this.db.users) {
-                if (len < amount && filter(this.db.guilds[key], key, this.db.guilds)) {
-                    len++
-                    res[key] = this.db.user[key]
-                }
-            }
-            return res
+            let len = 0, res = new discord.Collection(Object.entries(this.db.guilds))
+            return new discord.Collection(res.filter(filter).map((v, id) => [id, v]).slice(0, amount))
         } else throw "The guild database is not seted"
     }
 
     async getOneGuld(filter) {
         if (this.db.guilds) {
-            for (const key in this.db.guilds) {
-                if (filter(this.db.guilds[key], key, this.db.guilds)) return this.db.guilds[key]
-            }
+            const res = new discord.Collection(Object.entries(this.db.guilds))
+            return res.filter(filter).first()
         } else throw "The guild database is not seted"
     }
 

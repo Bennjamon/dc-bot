@@ -1,6 +1,5 @@
-
 declare module "dc-bot" {
-    import discordJS, { Client, Message } from "discord.js";
+    import discordJS, { Client, Message, ClientEvents, UserResolvable, GuildResolvable, Collection } from "discord.js";
     namespace dcBot {
     
         interface GuildInDB {
@@ -49,13 +48,13 @@ declare module "dc-bot" {
              * The secret token of your discord bot
              */
             
-            token?: string
+            token: string
     
             /**
              * The default prefix to your discord bot
              */
     
-            prefix?: string
+            defaultPrefix: string
     
     
             /**
@@ -74,7 +73,7 @@ declare module "dc-bot" {
             data: D
             name: string
             description: string
-            run(msg: Message, args: string[], userDB: UDB, guildDB: GDB, client: Client, discord: typeof discordJS, bot: Bot): Promise<any>
+            run(msg: Message, args: string[], userDB: UDB, guildDB: GDB, client: Client, discord: typeof discordJS, bot: Bot<D, GDB, UDB>): Promise<any>
         }
         
         interface CommandConstructor {
@@ -101,12 +100,12 @@ declare module "dc-bot" {
             name: string
             description: string
             data: D
-            run(msg: Message, args: string[], userDB: UDB, guildDB: GDB, client: Client, discord: typeof discordJS, bot: Bot): Promise<any>
+            run(msg: Message, args: string[], userDB: UDB, guildDB: GDB, client: Client, discord: typeof discordJS, bot: Bot<D, GDB, UDB>): Promise<any>
         }
         
         const Command: CommandConstructor
     
-        class Bot<C, GDB = undefined, UDB = undefined> {
+        class Bot<C, GDB, UDB> {
             
             /**
              * 
@@ -123,7 +122,8 @@ declare module "dc-bot" {
              *                      id: user.id
              *                  }
              *              }
-             *          }
+             *          },
+             *          guild
              *      }
              * })
              * 
@@ -157,13 +157,17 @@ declare module "dc-bot" {
     
             /**
              * Init your discord bot
+             * @returns {Promise<void>} A Promise to be resolved when the bot connects
              */
     
             init(): Promise<void>
-    
-            message(callback: (message: Message, userDB: UDB, guildDB: GDB) => void): void
+
+            on<K extends keyof ClientEvents>(event: K, callback: (...args: [eventArgs: ClientEvents[K], dbArgs: {
+                users: Collection<string, UDB>
+                guilds: Collection<string, GDB>
+            }]) => any): void
             addCommand<T>(...commands: CommandData<T, UDB, GDB>[]): Bot<T, GDB, UDB>
-            listenCommands(filter?: (commnand: Command<C, UDB, GDB>, name: string) => boolean,cb?: (err: boolean, 
+            listenCommands(filter?: (commnand: Command<C, UDB, GDB>, name: string) => boolean, cb?: (err: boolean, 
                 command: Command<C, UDB, GDB>, context: {
                 msg: Message
                 userDB?: UDB
@@ -177,21 +181,19 @@ declare module "dc-bot" {
                 user: boolean
             }, guildCB?: (guild: discordJS.Guild) => DBU, userCB?: (user: discordJS.User) => DBG): Bot<C, DBG, DBU>
             getUserById(id: string): Promise<UDB>
-            getUsers(filter: (user: UDB, key: string, dictionary: ParamsDictionary<UDB>) => boolean, amount: number): Promise<ParamsDictionary<UDB>>
-            getUsers(filter: (user: UDB, key: string, dictionary: ParamsDictionary<UDB>) => boolean, amount: 0): Promise<{}>
-            getOneUser(filter: (user: UDB, key: string, dictionary: ParamsDictionary<UDB>) => boolean): Promise<UDB>
+            getUsers(filter: (user: UDB, key: string, dictionary: Collection<string,UDB>) => boolean, amount?: number): Promise<Collection<string,UDB>>
+            getOneUser(filter: (user: UDB, key: string, dictionary: Collection<string,UDB>) => boolean): Promise<UDB>
             updateUser<T = {
-                [K in UDB]?: UDB[K]
+                [K in keyof UDB]?: UDB[K]
             }, R = T&UDB>(id: string, data: T): Promise<R>
             getGuildById(id: string): Promise<GDB>
-            getGuilds(filter: (user: GDB, key: string, dictionary: ParamsDictionary<GDB>) => boolean, amount: number): Promise<ParamsDictionary<GDB>>
-            getGuilds(filter: (user: GDB, key: string, dictionary: ParamsDictionary<GDB>) => boolean, amount: 0): Promise<{}>
-            getOneGuild(filter: (user: GDB, key: string, dictionary: ParamsDictionary<GDB>) => boolean): Promise<GDB>
+            getGuilds(filter: (user: GDB, key: string, dictionary: Collection<string, GDB>) => boolean, amount?: number): Promise<Collection<string, GDB>>
+            getOneGuild(filter: (user: GDB, key: string, dictionary: Collection<string, GDB>) => boolean): Promise<GDB>
             updateUser<T = {
-                [K in GDB]?: UDB[K]
+                [K in keyof GDB]?: GDB[K]
             }, R = T&GDB>(id: string, data: T): Promise<R>
         }
     
     }
-    export default dcBot
+    export = dcBot
 }
