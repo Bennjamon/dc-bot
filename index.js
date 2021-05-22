@@ -100,7 +100,7 @@ class Bot {
         return this
     }
     listenCommands(filter, cb) {
-        filter = filter || (() => true)
+        filter = filter || (() => false)
         this.client.on("message", async msg => {
             const prefix = this.db.guilds && this.prefixKey ? (await this.getGuildById(msg.guild.id))[this.prefixKey] || this.defaultPrefix : this.defaultPrefix
             if (!msg.author.bot && msg.content.startsWith(prefix)) {
