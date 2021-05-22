@@ -72,16 +72,22 @@ class Bot {
                     if (this.db.guilds) dbGuilds.set(d.guild.id, (await this.getGuildById(d.guild.id, true)))
                 } else if (typeof d == "string" && this.client.guilds.cache.has(d)) {
                     if (this.db.guilds) dbGuilds.set(d, (await this.getGuildById(d, this.getGuildById(d, true))))
-                } 
+                } else if (d.constructor == discord.GuildMember) {
+                    if (this.db.users) dbUsers.set(d.user.id, (await this.getUserById(d.author.id, true)))
+                    if (this.db.guilds) dbGuilds.set(d.guild.id, (await this.getGuildById(d.guild.id, true)))
+                }
             }
             callback(...args, {
                 users: dbUsers,
-                guids: dbGuilds
+                guilds: dbGuilds
             })
         })
     }
     addCommand(...commands) {
         commands.forEach(command => {
+            if (Array.isArray(command)) {
+                return this.addCommand(...command)
+            }
             if (Command.isCommand(command)) {
                 if (command.constructor != Command) command = new Command(command)
                 if (this.commands[command.name.toLowerCase()]) {

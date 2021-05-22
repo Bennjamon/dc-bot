@@ -1,22 +1,20 @@
 # dc-bot
-a module to create bots of discord
-## Install
+***
+A module to create bots of discord
+# Install
+***
 ```
 $ npm install dc-bot --save
 ```
-## Example
-```js
-const dcBot = require('dc-bot');
-
-const bot = new dcBot.Bot("<your secret token>", "<your prefix>")
-
-bot.addCommands(
-	{
-		name: "say",
-		description: "send a message",
-		async run (msg, args, client, discord, bot) {
-			await msg.channel.send(args.join(' '))
-		}
-	}
-)
-```
+# Bot class
+***
+The class for create a bot
+## Constructor
+***
+you can use 2 ways to create a bot
+**[constructor (token, prefix)](#constructor1)** --- The most simply way to create a bot
+**[constructor (option)](#constructor2)** --- Is more complex, but with more functions
+## Methods
+****
+### init
+Ini

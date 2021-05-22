@@ -45,7 +45,6 @@ class HelpCommand {
             data: data || {},
             description,
             async run (msg, args, udb, gdb, client, discord, bot) {
-                console.log(this.name);
                 const embed = new discord.MessageEmbed()
                 .setAuthor(client.user.username, client.user.avatarURL())
                 if (embedOptioms.title) embed.setTitle(embedOptioms.title)

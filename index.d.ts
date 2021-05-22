@@ -160,7 +160,7 @@ declare module "dc-bot" {
              * @returns {Promise<void>} A Promise to be resolved when the bot connects
              */
     
-            init(): Promise<void>
+            login(): Promise<void>
 
             on<K extends keyof ClientEvents>(event: K, callback: (...args: [eventArgs: ClientEvents[K], dbArgs: {
                 users: Collection<string, UDB>
