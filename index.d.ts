@@ -162,7 +162,7 @@ declare module "dc-bot" {
     
             login(): Promise<void>
 
-            on<K extends keyof ClientEvents>(event: K, callback: (...args: [eventArgs: ClientEvents[K], dbArgs: {
+            on<K extends keyof ClientEvents>(event: K, callback: (...args: [...eventArgs: ClientEvents[K], dbArgs: {
                 users: Collection<string, UDB>
                 guilds: Collection<string, GDB>
             }]) => any): void
@@ -189,7 +189,7 @@ declare module "dc-bot" {
             getGuildById(id: string): Promise<GDB>
             getGuilds(filter: (user: GDB, key: string, dictionary: Collection<string, GDB>) => boolean, amount?: number): Promise<Collection<string, GDB>>
             getOneGuild(filter: (user: GDB, key: string, dictionary: Collection<string, GDB>) => boolean): Promise<GDB>
-            updateUser<T = {
+            updateGuild<T = {
                 [K in keyof GDB]?: GDB[K]
             }, R = T&GDB>(id: string, data: T): Promise<R>
         }
