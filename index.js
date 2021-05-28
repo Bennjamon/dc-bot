@@ -8,6 +8,7 @@ class Bot {
         if (fs.existsSync(require.main.path + "/DB/users.json")) this.db.users = JSON.parse(fs.readFileSync(require.main.path + "/DB/users.json", "utf-8"))
         if (fs.existsSync(require.main.path + "/DB/guilds.json")) this.db.guilds = JSON.parse(fs.readFileSync(require.main.path + "/DB/guilds.json", "utf-8"))
         this.commands = {}
+        this.logged = false
         this.client = new discord.Client()
         this.onreadys = [
             () => {
@@ -51,12 +52,22 @@ class Bot {
         }
     }
 
-    init() {
-        this.client.on("ready", () => {
-            this.onreadys.forEach(fn => fn())
+    async login() {
+        await this.client.login(this[tokenSymbol]).then(() => {
+            this.logged = true
+        }).catch(() => {
+            throw "Invalid token"
         })
-        return this.client.login(Buffer.from(this[tokenSymbol], 'base64').toString())
     }
+
+    async logout() {
+        if (this.logged) {
+            this.client.destroy()
+        } else {
+            throw "Your bot is not logged"
+        }
+    }
+    
     on(event, callback) {
         const dbUsers = new discord.Collection()
         const dbGuilds = new discord.Collection()
