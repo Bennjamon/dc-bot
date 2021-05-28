@@ -167,15 +167,16 @@ declare module "dc-bot" {
                 guilds: Collection<string, GDB>
             }]) => any): void
             addCommand<T>(...commands: CommandData<T, UDB, GDB>[]): Bot<T, GDB, UDB>
-            listenCommands(filter?: (commnand: Command<C, UDB, GDB>, name: string) => boolean, cb?: (err: boolean, 
+            listenCommands(filter: ((commnand: Command<C, UDB, GDB>, name: string) => boolean)|null, cb?: ((err: boolean, 
                 command: Command<C, UDB, GDB>, context: {
                 msg: Message
                 userDB?: UDB
+                guildDB?: GDB
                 args: string[]
                 client: Client,
                 discord: typeof discordJS
                 bot: Bot<C, UDB, GDB>
-            }, run: () => void) => void): void
+            }, run: () => void) => void)|null): void
             addDB<DBG extends GuildInDB = UDB, DBU extends UserInDB = UDB>(options: {
                 guild: boolean
                 user: boolean

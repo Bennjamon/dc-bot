@@ -5,7 +5,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "node __test__/app.test.js"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
     "discord.js": "12.5.1",
