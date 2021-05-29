@@ -83,7 +83,7 @@ declare module "dc-bot" {
             isCommand(arg: any): arg is Command<any, any, any>
     
             EvalCommand: {
-                new<D>(name: string, description: string, data: D): Command<D, any, any>
+                new<D>(name: string, data: D, description: string): Command<D, any, any>
             }
     
             HelpCommand: {
