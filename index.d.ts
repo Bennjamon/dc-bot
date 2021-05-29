@@ -90,7 +90,7 @@ declare module "dc-bot" {
                 new<D>(name: string, data: D, description: string, filter?: (cmd: CommandData<any, any, D>) => boolean, embedOptions?: {
                     title: string
                     description: string
-                    inline: boolean
+                    inline?: boolean
                 }): Command<D, any, any>
             }
     
