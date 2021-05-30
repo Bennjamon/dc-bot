@@ -179,7 +179,7 @@ class Bot {
                 this.client.guilds.cache.forEach(g => add("guilds", guildDB(g), g.id))
                 fs.writeFileSync("DB/guilds.json", JSON.stringify(this.db.guilds, null, "\t"))
             })
-            this.client.on("guildMemberAdd", g => {
+            this.client.on("guildCreate", g => {
                 if (!this.db.guilds[g.id]) this.db.guilds[g.id] = guildDB(g)
                 fs.writeFileSync("DB/guilds.json", JSON.stringify(this.db.guilds, null, "\t"))
             })
