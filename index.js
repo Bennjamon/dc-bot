@@ -53,11 +53,9 @@ class Bot {
     }
 
     async login() {
-        this.client.on("ready", () => {
-            this.onreadys.forEach(fn => fn())
-        })
         await this.client.login(Buffer.from(this[tokenSymbol], "base64").toString("utf-8")).then(() => {
             this.logged = true
+            this.onreadys.forEach(fn => fn())
         }).catch(() => {
             throw "Invalid token"
         })
